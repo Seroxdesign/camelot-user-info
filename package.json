@@ -2,7 +2,7 @@
   "name": "camelot-user-info",
   "version": "1.0.0",
   "description": "fetch user's camelot pool tokens",
-  "main": "index.js",
+  "main": "camelot.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -12,6 +12,6 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "ethers": "^6.12.1"
+    "ethers": "^5.7.2"
   }
 }

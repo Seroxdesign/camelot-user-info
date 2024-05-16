@@ -1,25 +1,28 @@
-import { ethers } from 'ethers';
-
-import CamelotNitroPool from './abis/CamelotNitroPool.json';
-import CamelotPool from './abis/CamelotPool.json';
-import ERC20 from './abis/ERC20.json';
-import { fromBigNumber } from './utils';
+const { ethers } = require('ethers');
+const { formatUnits } = require('ethers/lib/utils');
+const CamelotNitroPool = require('./abis/CamelotNitroPool.json');
+const CamelotPool = require('./abis/CamelotPool.json');
+const ERC20 = require('./abis/ERC20.json');
 
 const getContract = (address, abi) => {
-  return new ethers.Contract(address, abi, new ethers.JsonRpcProvider('https://arb1.arbitrum.io/rpc'))
+  const jsonRpcProvider = new ethers.getDefaultProvider('https://arb1.arbitrum.io/rpc')
+  const contract = new ethers.Contract(address, abi, jsonRpcProvider)
+  return new ethers.Contract(address, abi, jsonRpcProvider)
 }
 
-const fetchUserPoolDetails = async (poolAddress: string, nitroPoolAddress: string, userAddress: string) => {
+const fromBigNumber = (number, decimals = 18) => {
+  return parseFloat(formatUnits(number.toString(), decimals))
+}
+
+const fetchUserPoolDetails = async (poolAddress, nitroPoolAddress, userAddress) => {
   // Fetch both pools
-  const camelotNitroPool = getContract(nitroPoolAddress, CamelotNitroPool)
-  const camelotPool = getContract(poolAddress, CamelotPool)
+  const camelotNitroPool = getContract(nitroPoolAddress, CamelotNitroPool.abi)
+  const camelotPool = getContract(poolAddress, CamelotPool.abi)
   // Fetch collateral tokens for pools
   const collateral0 = await camelotPool.token0()
   const collateral1 = await camelotPool.token1()
   const collateral0Contract = getContract(collateral0, ERC20.abi)
   const collateral1Contract = getContract(collateral1, ERC20.abi)
-
-  // 
   const response = await fetch('https://api.camelot.exchange/nitros')
   const res = await response.json()
   const tvlUSD = res.data.nitros[nitroPoolAddress] ?? 0
@@ -47,6 +50,7 @@ const fetchUserPoolDetails = async (poolAddress: string, nitroPoolAddress: strin
   // What percentage of the pool does the user own?
   const userPoolPercentage = userDepositAmount / totalDepositAmount * 100
   const userDollarValue = (userPoolPercentage / 100) * tvlUSD;
+
   console.log(
     collateralTokens, 
     userInfo,
@@ -55,6 +59,7 @@ const fetchUserPoolDetails = async (poolAddress: string, nitroPoolAddress: strin
     userPoolPercentage,
     userDollarValue,
   )
+
   return {
     collateralTokens, 
     userInfo,
