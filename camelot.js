@@ -6,7 +6,6 @@ const ERC20 = require('./abis/ERC20.json');
 
 const getContract = (address, abi) => {
   const jsonRpcProvider = new ethers.getDefaultProvider('https://arb1.arbitrum.io/rpc')
-  const contract = new ethers.Contract(address, abi, jsonRpcProvider)
   return new ethers.Contract(address, abi, jsonRpcProvider)
 }
 
@@ -17,6 +16,7 @@ const fromBigNumber = (number, decimals = 18) => {
 const fetchUserPoolDetails = async (poolAddress, nitroPoolAddress, userAddress) => {
   // Fetch both pools
   const camelotNitroPool = getContract(nitroPoolAddress, CamelotNitroPool.abi)
+  // WE NEED TO USE THIS TO CALCULATE THE USER'S POOL PERCENTAGE
   const camelotPool = getContract(poolAddress, CamelotPool.abi)
   // Fetch collateral tokens for pools
   const collateral0 = await camelotPool.token0()
@@ -58,7 +58,7 @@ const fetchUserPoolDetails = async (poolAddress, nitroPoolAddress, userAddress) 
     totalDepositAmount,
     userPoolPercentage,
     userDollarValue,
-    tvlUSD,
+    tvlUSD
     `User has ${userPoolPercentage}% of the pool, which is worth $${userDollarValue}`
   )
 
