@@ -1,0 +1,14 @@
+{
+  "name": "camelot-user-info",
+  "version": "1.0.0",
+  "description": "fetch user's camelot pool tokens",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ethers": "^6.12.1"
+  }
+}
