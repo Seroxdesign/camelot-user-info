@@ -1,11 +1,8 @@
-import { ethers, BigNumberish, formatUnits } from 'ethers';
+import { ethers } from 'ethers';
 
-import AlgebraPool from './abis/AlgebraPool.json';
 import CamelotNitroPool from './abis/CamelotNitroPool.json';
 import CamelotPool from './abis/CamelotPool.json';
-import DefiEdgeTwapStrategy from './abis/DefiEdgeTwapStrategy.json';
 import ERC20 from './abis/ERC20.json';
-import NFTPool from './abis/NFTPool.json';
 import { fromBigNumber } from './utils';
 
 const getContract = (address, abi) => {
@@ -21,6 +18,11 @@ const fetchUserPoolDetails = async (poolAddress: string, nitroPoolAddress: strin
   const collateral1 = await camelotPool.token1()
   const collateral0Contract = getContract(collateral0, ERC20.abi)
   const collateral1Contract = getContract(collateral1, ERC20.abi)
+
+  // 
+  const response = await fetch('https://api.camelot.exchange/nitros')
+  const res = await response.json()
+  const tvlUSD = res.data.nitros[nitroPoolAddress] ?? 0
 
   const collateralTokens = [
     {
@@ -40,9 +42,27 @@ const fetchUserPoolDetails = async (poolAddress: string, nitroPoolAddress: strin
   ]
     
   const userInfo = await camelotNitroPool.userInfo(userAddress)
-
+  const userDepositAmount = fromBigNumber(userInfo.totalDepositAmount)
+  const totalDepositAmount = fromBigNumber(await camelotNitroPool.totalDepositAmount())
+  // What percentage of the pool does the user own?
+  const userPoolPercentage = userDepositAmount / totalDepositAmount * 100
+  const userDollarValue = (userPoolPercentage / 100) * tvlUSD;
+  console.log(
+    collateralTokens, 
+    userInfo,
+    userDepositAmount,
+    totalDepositAmount,
+    userPoolPercentage,
+    userDollarValue,
+  )
   return {
     collateralTokens, 
-    userInfo
+    userInfo,
+    userDepositAmount,
+    totalDepositAmount,
+    userPoolPercentage,
+    userDollarValue,
   }
 }
+
+fetchUserPoolDetails('0x824959a55907d5350e73e151Ff48DabC5A37a657', '0x53F973256F410d1D8b10ce72D03D8dBBD3b1066E', '0xb919e09bb077013d5f93c898dafcc1d0c75559fe')
