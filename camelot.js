@@ -58,6 +58,8 @@ const fetchUserPoolDetails = async (poolAddress, nitroPoolAddress, userAddress) 
     totalDepositAmount,
     userPoolPercentage,
     userDollarValue,
+    tvlUSD,
+    `User has ${userPoolPercentage}% of the pool, which is worth $${userDollarValue}`
   )
 
   return {
